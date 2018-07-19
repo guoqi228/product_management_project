@@ -7,7 +7,7 @@ class Products extends Component {
     let items;
     if (this.props.items) {
       items = this.props.items.filter(this.props.isSearched(this.props.term)).map(item => {
-        return <ProductItem key={item.id} item={item} />
+        return <ProductItem key={item.id} item={item} handleRemoveProduct={this.props.handleRemoveProduct}/>
       })
     }
 
@@ -23,6 +23,7 @@ class Products extends Component {
               <th scope="col">ID</th>
               <th scope="col">Name</th>
               <th scope="col">Price</th>
+              <th scope="col">Option</th>
             </tr>
           </thead>
           <tbody>

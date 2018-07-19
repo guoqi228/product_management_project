@@ -3,6 +3,8 @@ import './App.css';
 import Header from './components/header';
 import Products from './components/products';
 import AddProduct from './components/addProduct';
+import firebase from './firebase';
+//import Animals from './components/animals';
 
 class App extends Component {
 
@@ -18,6 +20,7 @@ class App extends Component {
     this.isSearched = this.isSearched.bind(this);
     this.handleAddProduct = this.handleAddProduct.bind(this);
     this.generateId = this.generateId.bind(this);
+    this.handleRemoveProduct = this.handleRemoveProduct.bind(this);
   }
 
   componentWillMount() {
@@ -25,6 +28,7 @@ class App extends Component {
       {name: "Connor",
       occupation: "Instruction",
       searchTerm: "",
+      animals: [],
       products: [
           {
             "id": "101",
@@ -69,7 +73,14 @@ class App extends Component {
         ]
     }
     )
+    let prodRef = firebase.database().ref('products');
+    prodRef.push(this.state.products);
   }
+
+  componentDidMount(){
+  this.displayList();
+  }
+
 
   onSearch(e) {
     this.setState(
@@ -78,7 +89,6 @@ class App extends Component {
     }
   )
     //console.log(this.state.searchTerm);
-
   }
 
   isSearched(term) {
@@ -86,10 +96,46 @@ class App extends Component {
       return item.title.toLowerCase().includes(term.toLowerCase());
     }
   }
+
+  displayList() {
+    const prodsRef = firebase.database().ref('products');
+    prodsRef.on('value', (snapshot) => {
+      let products = snapshot.val();
+      let newState = [];
+      if (products != null) {
+        for (let index in products) {
+          newState.push({
+            id: products[index].id,
+            title: products[index].title,
+            price: products[index].price
+          });
+        }
+      }
+      this.setState({
+        products: newState
+      });
+    });
+  }
+
   handleAddProduct(product) {
     let current_prods = this.state.products;
     current_prods.push(product);
     this.setState({product: current_prods});
+    firebase.database().ref('products').set(current_prods);
+    this.displayList();
+  }
+
+  handleRemoveProduct(id) {
+    let current_prods = this.state.products;
+    for (let index in current_prods) {
+      if (current_prods[index].id === id) {
+        current_prods.splice(index, 1);
+      }
+    }
+    this.setState({products: current_prods});
+
+    firebase.database().ref('products').set(current_prods);
+    this.displayList();
   }
 
   generateId() {
@@ -105,13 +151,15 @@ class App extends Component {
   }
 
   render() {
+    //console.log("this.state.animals");
+    //console.log(this.state.animals);
     return (
       <div className="App">
         <Header onSearch={this.onSearch} my_name={this.state.name} my_occupation={this.state.occupation} />
         <div className="container">
         <div className="row">
           <AddProduct generateId={this.generateId()} handleAddProduct={this.handleAddProduct} />
-          <Products total={this.getTotal()} term={this.state.searchTerm} isSearched={this.isSearched} items={this.state.products} />
+          <Products handleRemoveProduct={this.handleRemoveProduct} total={this.getTotal()} term={this.state.searchTerm} isSearched={this.isSearched} items={this.state.products} />
         </div>
         </div>
       </div>
