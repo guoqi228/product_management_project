@@ -2,7 +2,7 @@ import firebase from 'firebase';
 // Initialize Firebase
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyDhsVgAfi28nAySmtjTK9-nm0LwVA0XgW8",
+  apiKey: "******************",
   authDomain: "productmanager-60182.firebaseapp.com",
   databaseURL: "https://productmanager-60182.firebaseio.com",
   projectId: "productmanager-60182",
